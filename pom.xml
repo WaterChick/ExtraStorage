@@ -59,7 +59,7 @@
 						<goals><goal>shade</goal></goals>
 						<configuration>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<minimizeJar>true</minimizeJar>
+							<minimizeJar>false</minimizeJar>
 							<relocations>
 								<relocation>
 									<pattern>org.bstats</pattern>
@@ -85,6 +85,7 @@
 									<pattern>me.hsgamer.topper</pattern>
 									<shadedPattern>me.hsgamer.extrastorage.lib.topper</shadedPattern>
 								</relocation>
+
 							</relocations>
 							<!-- Disable PaperMC's PluginRemapper -->
 							<transformers>
@@ -353,8 +354,13 @@
 		</dependency>
 		<dependency>
 			<groupId>io.github.projectunified</groupId>
+			<artifactId>craftitem-spigot-skull-handler</artifactId>
+			<version>${craftitem.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.projectunified</groupId>
 			<artifactId>craftitem-spigot-core</artifactId>
-			<version>1.4.0</version>
+			<version>${craftitem.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.projectunified</groupId>
