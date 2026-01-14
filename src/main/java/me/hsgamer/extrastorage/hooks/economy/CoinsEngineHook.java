@@ -66,18 +66,8 @@ public final class CoinsEngineHook
         double price = (worth.getPrice() / worth.getQuantity() * amount);
 
         String cur = instance.getSetting().getCurrency();
-        Currency currency;
+        Currency currency = CoinsEngineAPI.getCurrency(cur);
 
-        if (CoinsEngineAPI.hasCurrency(cur)) currency = CoinsEngineAPI.getCurrency(cur);
-        else {
-            instance.getLogger().warning("The currency with ID '" + cur + "' could not be found! Using Vault as default!");
-            Optional<Currency> optional = CoinsEngineAPI.getCurrencyManager().getVaultCurrency();
-            if (!optional.isPresent()) {
-                result.accept(new Result(-1, -1, false));
-                return;
-            }
-            currency = optional.get();
-        }
 
         if (instance.getSetting().isLogSales()) {
             instance.getLog().log(player, null, Log.Action.SELL, key, amount, price);

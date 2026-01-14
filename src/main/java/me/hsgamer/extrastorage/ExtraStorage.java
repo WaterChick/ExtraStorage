@@ -120,7 +120,7 @@ public final class ExtraStorage extends JavaPlugin {
     private void loadGuiFile() {
         new FilterGui(null, -1);
         new PartnerGui(null, -1);
-        new SellGui(null, -1);
+        //new SellGui(null, -1);
         new StorageGui(null, -1);
         new WhitelistGui(null, -1);
     }

@@ -30,7 +30,7 @@ public final class PlayerCommands
         this.add(new ToggleCmd());
         this.add(new FilterCmd());
         this.add(new PartnerCmd());
-        this.add(new SellCmd());
+        //this.add(new SellCmd());
         this.add(new WithdrawCmd());
     }
 
@@ -75,7 +75,6 @@ public final class PlayerCommands
                 this.hasPermission(sender, Constants.PLAYER_TOGGLE_PERMISSION) ? "toggle" : "",
                 this.hasPermission(sender, Constants.PLAYER_FILTER_PERMISSION) ? "filter" : "",
                 this.hasPermission(sender, Constants.PLAYER_PARTNER_PERMISSION) ? "partner" : "",
-                this.hasPermission(sender, Constants.PLAYER_SELL_PERMISSION) ? "sell" : "",
                 this.hasPermission(sender, Constants.PLAYER_WITHDRAW_PERMISSION) ? "withdraw" : ""
         );
 
@@ -92,14 +91,6 @@ public final class PlayerCommands
                             .filter(cmd -> cmd.startsWith(args1))
                             .collect(Collectors.toList());
                 case "withdraw":
-                case "sell":
-                    return user.getStorage()
-                            .getItems()
-                            .values()
-                            .stream()
-                            .filter(item -> (item.getKey().toLowerCase().startsWith(args1)) && (item.getQuantity() > 0))
-                            .map(Item::getKey)
-                            .collect(Collectors.toList());
                 default:
                     return null;
             }

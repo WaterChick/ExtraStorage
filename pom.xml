@@ -28,7 +28,7 @@
 		<playerpoints.version>3.2.6</playerpoints.version>
 		<tokenmanager.version>3.2.4</tokenmanager.version>
 		<ultraeconomy.version>1.1.2</ultraeconomy.version>
-		<coinsengine.version>2.4.1</coinsengine.version>
+		<coinsengine.version>2.6.0</coinsengine.version>
 		<placeholderapi.version>2.11.5</placeholderapi.version>
 		<wildstacker.version>2025.2</wildstacker.version>
 		<ultimatestacker.version>1.0.0-20240329.173606-35</ultimatestacker.version>
@@ -334,6 +334,8 @@
 			<version>${minelib.version}</version>
 		</dependency>
 
+
+
 		<dependency>
 			<groupId>io.github.projectunified</groupId>
 			<artifactId>craftitem-modifier</artifactId>
@@ -349,6 +351,18 @@
 			<artifactId>craftitem-spigot-skull</artifactId>
 			<version>${craftitem.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.github.projectunified</groupId>
+			<artifactId>craftitem-spigot-core</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.projectunified</groupId>
+			<artifactId>craftitem-core</artifactId>
+			<version>${craftitem.version}</version>
+		</dependency>
+
+
 	</dependencies>
 	
 </project>
