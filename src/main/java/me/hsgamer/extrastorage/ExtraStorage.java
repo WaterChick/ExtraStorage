@@ -85,10 +85,9 @@ public final class ExtraStorage extends JavaPlugin {
         }
 
         this.pendingSalesManager = new PendingSalesManager(
-                this.setting.getSellConfirmTimeout(),
-                this.setting.getSellCleanupInterval()
+                this.setting.getSellConfirmTimeout()
         );
-        //this.pendingSalesManager.startCleanup(this, this.setting.getSellCleanupInterval());
+        this.pendingSalesManager.startCleanup(this, this.setting.getSellCleanupInterval());
 
         this.registerCommands();
         this.registerEvents();
