@@ -181,28 +181,29 @@ public final class StorageGui
                                 if (!storageItem.isPresent() || storageItem.get().getQuantity() < sale.getAmount()) return;
 
                                 double finalPrice = sellHook.getPrice(priceCheckItem, player);
-                                if (finalPrice <= 0) return;
-                                double totalPrice = finalPrice * sale.getAmount();
 
-                                // Vault deposit
-                                RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
-                                if (rsp == null) return;
-                                Economy econ = rsp.getProvider();
-                                econ.depositPlayer(player, totalPrice);
+                                double totalPrice = finalPrice * sale.getAmount();
 
                                 storage.subtract(itemKey, sale.getAmount());
 
-                                if (instance.getSetting().isLogSales()) {
-                                    instance.getLog().log(player, null, Log.Action.SELL, itemKey, sale.getAmount(), totalPrice);
+                                if(totalPrice > 0){
+                                    RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
+                                    if (rsp == null) return;
+                                    Economy econ = rsp.getProvider();
+                                    econ.depositPlayer(player, totalPrice);
+                                    if (instance.getSetting().isLogSales()) {
+                                        instance.getLog().log(player, null, Log.Action.SELL, itemKey, sale.getAmount(), totalPrice);
+                                    }
+                                    sellHook.sendSoldMessage(player, totalPrice);
+                                }else{
+                                    player.sendMessage(Utils.colorize("&8[&2Server&8] &7Prodané itemy za &a$0.0&7."));
                                 }
-                                sellHook.sendSoldMessage(player, totalPrice);
 
                                 if (!partner.isOnline()) partner.save();
                                 this.reopenGui(page);
                             } else {
                                 double price = sellHook.getPrice(priceCheckItem, player);
-                                if (price <= 0) return;
-
+                                //if (price <= 0) return;
                                 pendingManager.addPending(player.getUniqueId(), itemKey, sellAmount, price);
                                 this.reopenGui(page);
                             }
