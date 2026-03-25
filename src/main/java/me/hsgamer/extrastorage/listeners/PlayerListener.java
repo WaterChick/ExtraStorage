@@ -31,6 +31,7 @@ public final class PlayerListener
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
+        instance.getPendingSalesManager().clearPlayer(uuid);
         manager.save(uuid);
     }
 

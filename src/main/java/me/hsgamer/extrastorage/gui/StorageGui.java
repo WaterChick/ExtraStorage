@@ -1,5 +1,6 @@
 package me.hsgamer.extrastorage.gui;
 
+import me.hsgamer.extrastorage.ExtraStorage;
 import me.hsgamer.extrastorage.api.item.Item;
 import me.hsgamer.extrastorage.api.storage.Storage;
 import me.hsgamer.extrastorage.api.user.User;
@@ -7,16 +8,22 @@ import me.hsgamer.extrastorage.configs.Message;
 import me.hsgamer.extrastorage.configs.Setting;
 import me.hsgamer.extrastorage.data.Constants;
 import me.hsgamer.extrastorage.data.log.Log;
+import me.hsgamer.extrastorage.data.sale.PendingSale;
+import me.hsgamer.extrastorage.data.sale.PendingSalesManager;
 import me.hsgamer.extrastorage.gui.base.ESGui;
 import me.hsgamer.extrastorage.gui.icon.Icon;
 import me.hsgamer.extrastorage.gui.item.GUIItemModifier;
+import me.hsgamer.extrastorage.hooks.sellgui.SellGUIHook;
 import me.hsgamer.extrastorage.util.Digital;
 import me.hsgamer.extrastorage.util.ItemUtil;
 import me.hsgamer.extrastorage.util.Utils;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.*;
 
@@ -30,6 +37,7 @@ public final class StorageGui
 
     private Map<String, Item> items;
     private int[] slots;
+    private boolean reopening = false;
 
     private StorageGui(Player player, User partner, int page, SortType sort, boolean order) {
         super("gui/storage", player, page, sort, order);
@@ -89,12 +97,18 @@ public final class StorageGui
 
     @Override
     public void reopenGui(int page) {
+        this.reopening = true;
         new StorageGui(player, partner, page, sort, orderSort).open();
     }
 
     @Override
     public void reopenGui(int page, SortType sort, boolean order) {
+        this.reopening = true;
         new StorageGui(player, partner, page, sort, order).open();
+    }
+
+    public boolean isReopening() {
+        return reopening;
     }
 
     private void load() {
@@ -145,6 +159,57 @@ public final class StorageGui
                         if ((clicked == null) || (clicked.getType() == Material.AIR)) return;
 
                         final ClickType click = event.getEvent().getClick();
+
+                        if (click == ClickType.DROP || click == ClickType.CONTROL_DROP) {
+                            event.getEvent().setCancelled(true);
+                            if (!this.hasPermission(Constants.PLAYER_SELL_PERMISSION)) return;
+
+                            SellGUIHook sellHook = ExtraStorage.getInstance().getSellGUIHook();
+                            if (!sellHook.isAvailable()) return;
+                            PendingSalesManager pendingManager = ExtraStorage.getInstance().getPendingSalesManager();
+                            String itemKey = key;
+                            int sellAmount = (int) Math.min(item.getQuantity(), Integer.MAX_VALUE);
+                            if (sellAmount <= 0) return;
+                            ItemStack priceCheckItem = item.getItem();
+                            if (priceCheckItem == null) return;
+                            priceCheckItem.setAmount(1);
+                            if (pendingManager.isPending(player.getUniqueId(), itemKey)) {
+                                PendingSale sale = pendingManager.confirmAndRemove(player.getUniqueId(), itemKey);
+                                if (sale == null) return;
+
+                                Optional<Item> storageItem = storage.getItem(itemKey);
+                                if (!storageItem.isPresent() || storageItem.get().getQuantity() < sale.getAmount()) return;
+
+                                double finalPrice = sellHook.getPrice(priceCheckItem, player);
+
+                                double totalPrice = finalPrice * sale.getAmount();
+
+                                storage.subtract(itemKey, sale.getAmount());
+
+                                if(totalPrice > 0){
+                                    RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
+                                    if (rsp == null) return;
+                                    Economy econ = rsp.getProvider();
+                                    econ.depositPlayer(player, totalPrice);
+                                    if (instance.getSetting().isLogSales()) {
+                                        instance.getLog().log(player, null, Log.Action.SELL, itemKey, sale.getAmount(), totalPrice);
+                                    }
+                                    sellHook.sendSoldMessage(player, totalPrice);
+                                }else{
+                                    player.sendMessage(Utils.colorize("&8[&2Server&8] &7Prodané itemy za &a$0.0&7."));
+                                }
+
+                                if (!partner.isOnline()) partner.save();
+                                this.reopenGui(page);
+                            } else {
+                                double price = sellHook.getPrice(priceCheckItem, player);
+                                //if (price <= 0) return;
+                                pendingManager.addPending(player.getUniqueId(), itemKey, sellAmount, price);
+                                this.reopenGui(page);
+                            }
+                            return;
+                        }
+
                         if (click == ClickType.SHIFT_RIGHT) {
                             // Chuyển tất cả vật phẩm trong kho đồ của người chơi vào kho chứa:
                             if (storage.isMaxSpace()) {

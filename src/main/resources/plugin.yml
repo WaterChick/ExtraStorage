@@ -4,17 +4,11 @@ main: me.hsgamer.extrastorage.ExtraStorage
 api-version: 1.16
 folia-supported: true
 authors: [ HSGamer, HyronicTeam ]
+depend: [Vault]
 softdepend:
   - HeadDatabase
-  - Vault
   - PlaceholderAPI
-  - ShopGUIPlus
-  - EconomyShopGUI
-  - EconomyShopGUI-Premium
-  - PlayerPoints
-  - TokenManager
-  - UltraEconomy
-  - CoinsEngine
+  - SellGUI
   - WildStacker
   - UltimateStacker
   - RoseStacker

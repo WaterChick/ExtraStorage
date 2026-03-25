@@ -23,12 +23,7 @@
 		<bstats.version>3.0.2</bstats.version>
 		<headdatabase.version>1.3.1</headdatabase.version>
 		<vault.version>1.7.1</vault.version>
-		<shopgui.version>3.0.0</shopgui.version>
-		<economyshopgui.version>1.7.0</economyshopgui.version>
-		<playerpoints.version>3.2.6</playerpoints.version>
-		<tokenmanager.version>3.2.4</tokenmanager.version>
-		<ultraeconomy.version>1.1.2</ultraeconomy.version>
-		<coinsengine.version>2.6.0</coinsengine.version>
+		<sellgui.version>1.6.1</sellgui.version>
 		<placeholderapi.version>2.11.5</placeholderapi.version>
 		<wildstacker.version>2025.2</wildstacker.version>
 		<ultimatestacker.version>1.0.0-20240329.173606-35</ultimatestacker.version>
@@ -181,51 +176,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.github.brcdev-minecraft</groupId>
-			<artifactId>shopgui-api</artifactId>
-			<version>${shopgui.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.github.Gypopo</groupId>
-			<artifactId>EconomyShopGUI-API</artifactId>
-			<version>${economyshopgui.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.black_ixx</groupId>
-			<artifactId>playerpoints</artifactId>
-			<version>${playerpoints.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.Realizedd</groupId>
-			<artifactId>TokenManager</artifactId>
-			<version>${tokenmanager.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>me.TechsCode</groupId>
-			<artifactId>UltraEconomyAPI</artifactId>
-			<version>${ultraeconomy.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>su.nightexpress.coinsengine</groupId>
-			<artifactId>CoinsEngine</artifactId>
-			<version>${coinsengine.version}</version>
+			<groupId>me.aov</groupId>
+			<artifactId>SellGUI</artifactId>
+			<version>${sellgui.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -366,6 +319,11 @@
 			<groupId>io.github.projectunified</groupId>
 			<artifactId>craftitem-core</artifactId>
 			<version>${craftitem.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>16.0.1</version>
 		</dependency>
 
 

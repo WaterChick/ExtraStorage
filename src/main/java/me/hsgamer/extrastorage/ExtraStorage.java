@@ -8,9 +8,10 @@ import me.hsgamer.extrastorage.configs.Message;
 import me.hsgamer.extrastorage.configs.Setting;
 import me.hsgamer.extrastorage.configs.types.BukkitConfigChecker;
 import me.hsgamer.extrastorage.data.log.Log;
+import me.hsgamer.extrastorage.data.sale.PendingSalesManager;
 import me.hsgamer.extrastorage.data.user.UserManager;
-import me.hsgamer.extrastorage.data.worth.WorthManager;
 import me.hsgamer.extrastorage.gui.*;
+import me.hsgamer.extrastorage.hooks.sellgui.SellGUIHook;
 import me.hsgamer.extrastorage.gui.abstraction.GuiCreator;
 import me.hsgamer.extrastorage.hooks.placeholder.ESPlaceholder;
 import me.hsgamer.extrastorage.listeners.InventoryListener;
@@ -42,7 +43,9 @@ public final class ExtraStorage extends JavaPlugin {
     private Message message;
 
     private UserManager userManager;
-    private WorthManager worthManager;
+
+    private SellGUIHook sellGUIHook;
+    private PendingSalesManager pendingSalesManager;
 
     private Log log;
 
@@ -75,6 +78,17 @@ public final class ExtraStorage extends JavaPlugin {
 
         this.log = new Log(this);
 
+        this.sellGUIHook = new SellGUIHook();
+        this.sellGUIHook.init();
+        if (this.sellGUIHook.isAvailable()) {
+            getLogger().info("Hooked into SellGUI");
+        }
+
+        this.pendingSalesManager = new PendingSalesManager(
+                this.setting.getSellConfirmTimeout()
+        );
+        this.pendingSalesManager.startCleanup(this, this.setting.getSellCleanupInterval());
+
         this.registerCommands();
         this.registerEvents();
 
@@ -89,6 +103,7 @@ public final class ExtraStorage extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (pendingSalesManager != null) pendingSalesManager.stop();
         if ((placeholder != null) && placeholder.isRegistered()) placeholder.unregister();
         Bukkit.getServer().getOnlinePlayers().forEach(player -> {
             InventoryHolder holder = player.getOpenInventory().getTopInventory().getHolder();
@@ -112,7 +127,6 @@ public final class ExtraStorage extends JavaPlugin {
     private void loadConfigs() {
         this.setting = new Setting();
         this.message = new Message();
-        this.worthManager = new WorthManager();
 
         new BukkitConfigChecker(setting, message).startTracking();
     }
@@ -120,7 +134,6 @@ public final class ExtraStorage extends JavaPlugin {
     private void loadGuiFile() {
         new FilterGui(null, -1);
         new PartnerGui(null, -1);
-        //new SellGui(null, -1);
         new StorageGui(null, -1);
         new WhitelistGui(null, -1);
     }
@@ -162,8 +175,12 @@ public final class ExtraStorage extends JavaPlugin {
         return this.userManager;
     }
 
-    public WorthManager getWorthManager() {
-        return this.worthManager;
+    public SellGUIHook getSellGUIHook() {
+        return this.sellGUIHook;
+    }
+
+    public PendingSalesManager getPendingSalesManager() {
+        return this.pendingSalesManager;
     }
 
     public Log getLog() {

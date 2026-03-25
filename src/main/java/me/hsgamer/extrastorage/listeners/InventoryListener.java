@@ -6,8 +6,10 @@ import me.hsgamer.extrastorage.gui.events.GuiClickEvent;
 import me.hsgamer.extrastorage.gui.icon.Icon;
 import me.hsgamer.extrastorage.gui.icon.events.IconClickEvent;
 import org.bukkit.entity.Player;
+import me.hsgamer.extrastorage.gui.StorageGui;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.HashMap;
@@ -52,6 +54,17 @@ public final class InventoryListener
         Icon icon = gui.getIconAt(event.getSlot());
         if (icon == null) return;
         icon.callClick(new IconClickEvent(event, icon, player));
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+        InventoryHolder holder = event.getInventory().getHolder();
+        if (!(holder instanceof StorageGui)) return;
+        StorageGui gui = (StorageGui) holder;
+        if (gui.isReopening()) return;
+        Player player = (Player) event.getPlayer();
+        instance.getPendingSalesManager().clearPlayer(player.getUniqueId());
     }
 
 }
