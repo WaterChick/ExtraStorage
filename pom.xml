@@ -320,6 +320,11 @@
 			<artifactId>craftitem-core</artifactId>
 			<version>${craftitem.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>16.0.1</version>
+		</dependency>
 
 
 	</dependencies>
