@@ -37,6 +37,7 @@ public final class StorageGui
 
     private Map<String, Item> items;
     private int[] slots;
+    private boolean reopening = false;
 
     private StorageGui(Player player, User partner, int page, SortType sort, boolean order) {
         super("gui/storage", player, page, sort, order);
@@ -96,12 +97,18 @@ public final class StorageGui
 
     @Override
     public void reopenGui(int page) {
+        this.reopening = true;
         new StorageGui(player, partner, page, sort, orderSort).open();
     }
 
     @Override
     public void reopenGui(int page, SortType sort, boolean order) {
+        this.reopening = true;
         new StorageGui(player, partner, page, sort, order).open();
+    }
+
+    public boolean isReopening() {
+        return reopening;
     }
 
     private void load() {
@@ -155,31 +162,30 @@ public final class StorageGui
 
                         // Q-drop sell handler
                         if (click == ClickType.DROP || click == ClickType.CONTROL_DROP) {
+                            System.out.println("Drop catched");
                             event.getEvent().setCancelled(true);
                             if (!this.hasPermission(Constants.PLAYER_SELL_PERMISSION)) return;
 
                             SellGUIHook sellHook = ExtraStorage.getInstance().getSellGUIHook();
                             if (!sellHook.isAvailable()) return;
-
+                            System.out.println("Sell GUI hook available");
                             PendingSalesManager pendingManager = ExtraStorage.getInstance().getPendingSalesManager();
                             String itemKey = key;
                             int sellAmount = (int) Math.min(item.getQuantity(), Integer.MAX_VALUE);
                             if (sellAmount <= 0) return;
-
+                            System.out.println("Sell amount bigger than 0");
                             ItemStack priceCheckItem = item.getItem();
                             if (priceCheckItem == null) return;
                             priceCheckItem.setAmount(1);
-
+                            System.out.println("Pending sale: " + pendingManager.isPending(player.getUniqueId(), itemKey));
+                            System.out.println(itemKey);
                             if (pendingManager.isPending(player.getUniqueId(), itemKey)) {
-                                // === SECOND DROP -> SELL ===
                                 PendingSale sale = pendingManager.confirmAndRemove(player.getUniqueId(), itemKey);
                                 if (sale == null) return;
 
-                                // Re-validate amount in storage
                                 Optional<Item> storageItem = storage.getItem(itemKey);
                                 if (!storageItem.isPresent() || storageItem.get().getQuantity() < sale.getAmount()) return;
 
-                                // Re-calculate price via SellGUI API
                                 double finalPrice = sellHook.getPrice(priceCheckItem, player);
                                 if (finalPrice <= 0) return;
                                 double totalPrice = finalPrice * sale.getAmount();
@@ -190,15 +196,11 @@ public final class StorageGui
                                 Economy econ = rsp.getProvider();
                                 econ.depositPlayer(player, totalPrice);
 
-                                // Subtract from storage
                                 storage.subtract(itemKey, sale.getAmount());
 
-                                // Log
                                 if (instance.getSetting().isLogSales()) {
                                     instance.getLog().log(player, null, Log.Action.SELL, itemKey, sale.getAmount(), totalPrice);
                                 }
-
-                                // Send SellGUI sold-message
                                 sellHook.sendSoldMessage(player, totalPrice);
 
                                 if (!partner.isOnline()) partner.save();
@@ -206,6 +208,7 @@ public final class StorageGui
                             } else {
                                 // === FIRST DROP -> ADD TO PENDING (SILENT) ===
                                 double price = sellHook.getPrice(priceCheckItem, player);
+                                System.out.println(price);
                                 if (price <= 0) return;
 
                                 pendingManager.addPending(player.getUniqueId(), itemKey, sellAmount, price);

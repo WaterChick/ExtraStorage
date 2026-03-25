@@ -61,6 +61,8 @@ public final class InventoryListener
         if (!(event.getPlayer() instanceof Player)) return;
         InventoryHolder holder = event.getInventory().getHolder();
         if (!(holder instanceof StorageGui)) return;
+        StorageGui gui = (StorageGui) holder;
+        if (gui.isReopening()) return;
         Player player = (Player) event.getPlayer();
         instance.getPendingSalesManager().clearPlayer(player.getUniqueId());
     }

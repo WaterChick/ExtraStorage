@@ -1,6 +1,5 @@
 package me.hsgamer.extrastorage.data.sale;
 
-import me.hsgamer.extrastorage.ExtraStorage;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -37,9 +36,14 @@ public final class PendingSalesManager {
 
     public boolean isPending(UUID playerUUID, String itemKey) {
         String key = makeKey(playerUUID, itemKey);
+        System.out.println("Trying to get sale by key: " + key);
         PendingSale sale = pendingSales.get(key);
-        if (sale == null) return false;
+        if (sale == null) {
+            System.out.println("Sale is null");
+            return false;
+        }
         if (sale.isExpired(timeoutMs)) {
+            System.out.println("Sale is expired");
             pendingSales.remove(key);
             return false;
         }
@@ -48,7 +52,17 @@ public final class PendingSalesManager {
 
     public void addPending(UUID playerUUID, String itemKey, int amount, double pricePerUnit) {
         String key = makeKey(playerUUID, itemKey);
+        System.out.println("Added new sale: " + key);
         pendingSales.put(key, new PendingSale(playerUUID, itemKey, amount, pricePerUnit));
+        printPendings();
+    }
+
+    private void printPendings(){
+        System.out.println("---");
+        for(Map.Entry<String, PendingSale> entry : pendingSales.entrySet()){
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue().getItemKey() + " | " + entry.getValue().getAmount());
+        }
     }
 
     public PendingSale confirmAndRemove(UUID playerUUID, String itemKey) {
