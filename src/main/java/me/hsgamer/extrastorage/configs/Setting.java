@@ -4,7 +4,6 @@ import io.github.projectunified.uniitem.api.Item;
 import me.hsgamer.extrastorage.Debug;
 import me.hsgamer.extrastorage.configs.types.BukkitConfig;
 import me.hsgamer.extrastorage.data.Constants;
-import me.hsgamer.extrastorage.hooks.economy.*;
 import me.hsgamer.extrastorage.util.Digital;
 import me.hsgamer.extrastorage.util.ItemUtil;
 import me.hsgamer.extrastorage.util.SoundUtil;
@@ -35,8 +34,8 @@ public final class Setting
 
     private boolean logSales, logTransfer, logWithdraw;
 
-    private EconomyProvider economyProvider;
-    private String currency;
+    private long sellConfirmTimeout;
+    private long sellCleanupInterval;
 
     private long maxSpace;
     private boolean blockedMining;
@@ -66,37 +65,8 @@ public final class Setting
 
         this.onlyStoreWhenInvFull = config.getBoolean("OnlyStoreWhenInvFull");
 
-        String economyProvider = config.getString("Economy.Provider", "VAULT").toUpperCase();
-        switch (economyProvider) {
-            case "SHOPGUIPLUS":
-                this.economyProvider = new ShopGuiPlusHook();
-                break;
-            case "ECONOMYSHOPGUI":
-                this.economyProvider = new EconomyShopGuiHook();
-                break;
-            case "PLAYERPOINTS":
-                this.economyProvider = new PlayerPointsHook();
-                break;
-            case "TOKENMANAGER":
-                this.economyProvider = new TokenManagerHook();
-                break;
-            case "ULTRAECONOMY":
-                this.economyProvider = new UltraEconomyHook();
-                break;
-            case "COINSENGINE":
-                this.economyProvider = new CoinsEngineHook();
-                break;
-            case "VAULT":
-                this.economyProvider = new VaultHook();
-                break;
-            default:
-                this.economyProvider = new NoneEconomyHook();
-                break;
-        }
-        if (!this.economyProvider.isHooked()) {
-            this.economyProvider = new NoneEconomyHook();
-        }
-        this.currency = config.getString("Economy.Currency", "");
+        this.sellConfirmTimeout = config.getLong("Sell.ConfirmTimeout", 10);
+        this.sellCleanupInterval = config.getLong("Sell.CleanupInterval", 30);
 
         this.autoUpdateTime = Digital.getBetween(10, Integer.MAX_VALUE, config.getInt("AutoUpdateTime", 30));
 
@@ -240,12 +210,12 @@ public final class Setting
         return this.logWithdraw;
     }
 
-    public EconomyProvider getEconomyProvider() {
-        return this.economyProvider;
+    public long getSellConfirmTimeout() {
+        return this.sellConfirmTimeout;
     }
 
-    public String getCurrency() {
-        return this.currency;
+    public long getSellCleanupInterval() {
+        return this.sellCleanupInterval;
     }
 
     public long getMaxSpace() {

@@ -1,7 +1,6 @@
 package me.hsgamer.extrastorage.api;
 
 import me.hsgamer.extrastorage.ExtraStorage;
-import me.hsgamer.extrastorage.api.item.Worth;
 import me.hsgamer.extrastorage.api.user.User;
 import org.bukkit.OfflinePlayer;
 
@@ -27,10 +26,6 @@ public final class StorageAPI {
 
     public User getUser(OfflinePlayer player) {
         return this.getUser(player.getUniqueId());
-    }
-
-    public Worth getWorth(String key) {
-        return main.getWorthManager().getWorth(key);
     }
 
 }
